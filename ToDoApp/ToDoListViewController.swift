@@ -55,6 +55,31 @@ class TodoListViewController: UITableViewController {
         }
     }
     
+    @IBAction func addItemButtonPressed(_ sender: UIBarButtonItem) {
+        
+        var textField = UITextField()
+       
+        let alert = UIAlertController.init(title: "Add new ToDO item", message: "", preferredStyle: UIAlertController.Style.alert)
+       
+        
+        let action = UIAlertAction(title: "Add Item", style: .default ){ (action) in
+            // what will happen when the user presses the add item button.
+            self.toDoList.append(textField.text!)
+            self.tableView.reloadData()
+        }
+        
+        alert.addTextField { (alertTextField) in
+            alertTextField.placeholder = "Create new item"
+            textField = alertTextField
+        }
+        
+        
+        alert.addAction(action)
+        
+        
+        present(alert, animated: true, completion: nil )
+        
+    }
     
     
 }
