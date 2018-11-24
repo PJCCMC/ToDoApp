@@ -32,5 +32,30 @@ class TodoListViewController: UITableViewController {
         
         return cell
     }
+    
+    //MARK : tableview delegate method
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
+        print ("row selected : \(indexPath.row)")
+        
+       // print (tableView.cellForRow(at: indexPath)?.textLabel?.text! as Any)
+        
+       // print (toDoList[indexPath.row] )
+        
+        tableView.deselectRow(at: indexPath, animated: true)
+        
+        if tableView.cellForRow(at: indexPath)?.accessoryType != .checkmark {
+            tableView.cellForRow(at: indexPath)?.textLabel?.textColor = UIColor.red
+            tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
+        }else {
+            tableView.cellForRow(at: indexPath)?.textLabel?.textColor = UIColor.black
+            tableView.cellForRow(at: indexPath)?.accessoryType = .none
+            
+        }
+    }
+    
+    
+    
 }
 
