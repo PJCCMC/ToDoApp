@@ -12,19 +12,19 @@ class TodoListViewController: UITableViewController {
     
     let defaults = UserDefaults.standard
     
-    var toDoList  = [String]()
+    var toDoList  = [ToDoItem]()
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
-        
-        if let toDoItems = defaults.array(forKey: "ToDoList") as? [String] {
-            
-            toDoList = toDoItems
-            
-        }
         
         
+        if let toDoItems = defaults.array(forKey: "ToDoList") as? [ToDoItem] {
+           toDoList = toDoItems
+         }
+        
+        let toDoItem = ToDoItem(toDoText: "Get some milk")
+       
+        toDoList.append(toDoItem)
         
     }
 
@@ -36,10 +36,19 @@ class TodoListViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-            let cell = tableView.dequeueReusableCell(withIdentifier: "ToDoItemCell", for: indexPath)
+        let currentItem = toDoList[indexPath.row]
         
-        cell.textLabel?.text = toDoList[indexPath.row]
+        let cell = tableView.dequeueReusableCell(withIdentifier: "ToDoItemCell", for: indexPath)
+        cell.textLabel?.text = currentItem.toDoText
         
+        // Ternary operator
+        // value = condition ? value true : value false
+        
+        cell.accessoryType = currentItem.isChecked  ? .checkmark : .none
+        cell.textLabel?.textColor = currentItem.isChecked ? UIColor.lightGray : UIColor.black
+        
+        
+    
         return cell
     }
     
@@ -49,20 +58,12 @@ class TodoListViewController: UITableViewController {
         
         print ("row selected : \(indexPath.row)")
         
-       // print (tableView.cellForRow(at: indexPath)?.textLabel?.text! as Any)
-        
-       // print (toDoList[indexPath.row] )
-        
         tableView.deselectRow(at: indexPath, animated: true)
         
-        if tableView.cellForRow(at: indexPath)?.accessoryType != .checkmark {
-            tableView.cellForRow(at: indexPath)?.textLabel?.textColor = UIColor.red
-            tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
-        }else {
-            tableView.cellForRow(at: indexPath)?.textLabel?.textColor = UIColor.black
-            tableView.cellForRow(at: indexPath)?.accessoryType = .none
-            
-        }
+        
+        toDoList[indexPath.row].isChecked = !toDoList[indexPath.row].isChecked
+        
+      tableView.reloadData()
     }
     
     @IBAction func addItemButtonPressed(_ sender: UIBarButtonItem) {
@@ -74,9 +75,11 @@ class TodoListViewController: UITableViewController {
         
         let action = UIAlertAction(title: "Add Item", style: .default ){ (action) in
             // what will happen when the user presses the add item button.
-            self.toDoList.append(textField.text!)
-            
-            self.defaults.set(self.toDoList, forKey: "ToDoList")
+            //self.toDoList.append(textField.text!)
+            // toDoList[indexPath.row].toDoText
+           // self.defaults.set(self.toDoList, forKey: "ToDoList")
+            let newToDoItem = ToDoItem(toDoText: textField.text!)
+            self.toDoList.append(newToDoItem)
             
             self.tableView.reloadData()
         }
