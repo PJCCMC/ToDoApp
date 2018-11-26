@@ -8,7 +8,7 @@
 
 import Foundation
 
-class ToDoItem {
+class ToDoItem : Encodable, Decodable {
     var toDoText : String = ""
     var isChecked = false
     

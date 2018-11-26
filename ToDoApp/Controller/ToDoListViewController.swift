@@ -10,26 +10,20 @@ import UIKit
 
 class TodoListViewController: UITableViewController {
     
-    let defaults = UserDefaults.standard
+    
+    let dataPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("ToDoListItems.plist")
     
     var toDoList  = [ToDoItem]()
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+      //  print (dataPath)
         
-        
-        if let toDoItems = defaults.array(forKey: "ToDoList") as? [ToDoItem] {
-           toDoList = toDoItems
-         }
-        
-        let toDoItem = ToDoItem(toDoText: "Get some milk")
-       
-        toDoList.append(toDoItem)
-        
+        loadData()
     }
+    
 
     //MARK : tableview datas source methods
-    
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return toDoList.count
     }
@@ -43,17 +37,14 @@ class TodoListViewController: UITableViewController {
         
         // Ternary operator
         // value = condition ? value true : value false
-        
         cell.accessoryType = currentItem.isChecked  ? .checkmark : .none
         cell.textLabel?.textColor = currentItem.isChecked ? UIColor.lightGray : UIColor.black
         
-        
-    
         return cell
     }
+
     
     //MARK : tableview delegate method
-    
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
         print ("row selected : \(indexPath.row)")
@@ -63,9 +54,12 @@ class TodoListViewController: UITableViewController {
         
         toDoList[indexPath.row].isChecked = !toDoList[indexPath.row].isChecked
         
-      tableView.reloadData()
+         updateData()
+        
+      
     }
     
+    // MARK : add new items
     @IBAction func addItemButtonPressed(_ sender: UIBarButtonItem) {
         
         var textField = UITextField()
@@ -74,14 +68,12 @@ class TodoListViewController: UITableViewController {
        
         
         let action = UIAlertAction(title: "Add Item", style: .default ){ (action) in
-            // what will happen when the user presses the add item button.
-            //self.toDoList.append(textField.text!)
-            // toDoList[indexPath.row].toDoText
-           // self.defaults.set(self.toDoList, forKey: "ToDoList")
+           
             let newToDoItem = ToDoItem(toDoText: textField.text!)
             self.toDoList.append(newToDoItem)
             
-            self.tableView.reloadData()
+            self.updateData()
+           
         }
         
         alert.addTextField { (alertTextField) in
@@ -97,6 +89,36 @@ class TodoListViewController: UITableViewController {
         
     }
     
+    // MARK : data manupulation for the Data Model
+    func updateData (){
+        
+        let encoder = PropertyListEncoder()
+        
+        do {
+            let data = try encoder.encode(toDoList)
+            try data.write(to: dataPath!)
+        } catch {
+            print("Error in adding item to toDoListArray \(error)")
+        }
+        
+        tableView.reloadData()
+        
+    }
     
+    // func to load saved infomation from a plist file if it does exist.
+    func loadData () {
+        
+        if let data =  try? Data(contentsOf: dataPath!){  // check to see if there is a file
+           let decoder = PropertyListDecoder()            // create a decoder
+        
+            do{
+                try toDoList = decoder.decode([ToDoItem].self, from: data)  // decode the plist file and load into the class array.
+            }catch {
+                print ("ToDOItems Plist file mot decoded \(error)")
+            }
+            
+        }
+        
+    }
 }
 
